@@ -1,0 +1,18 @@
+# Ambienti virtuali di Python
+venv/
+.venv/
+env/
+
+# Byte-compiled / cache di Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Configurazioni locali o sensibili (se presenti)
+.env
+mcp_config.json
+
+# File temporanei del sistema operativo
+.DS_Store
+Thumbs.db
+WORK/
