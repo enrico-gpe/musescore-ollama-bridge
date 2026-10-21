@@ -364,7 +364,7 @@ async def prompt_ollama(user_input):
                     if not measures:
                         return "Impossibile analizzare lo spartito. Nessuna battuta trovata."
 
-                    # Protezione: Reindirizzamento automatico a staff0 se l'unico rigo esistente nello spartito
+                    # Protezione: Reindirizzamento automatico a staff0 se è l'unico rigo esistente
                     staff_key = f"staff{staff_idx}"
                     staves_disponibili = list(measures[0].get("elements", {}).keys())
                     if staff_key not in staves_disponibili and "staff0" in staves_disponibili:
@@ -373,6 +373,9 @@ async def prompt_ollama(user_input):
                         staff_key = "staff0"
 
                     modified_measures_count = 0
+
+                    # Soglia adatta ai valori MIDI generati da Audiveris (es. 38/40 anziché 28)
+                    SOGLIA_BASS_PITCH = 40
 
                     for idx, measure in enumerate(measures):
                         elements = measure.get("elements", {}).get(staff_key, [])
@@ -390,23 +393,23 @@ async def prompt_ollama(user_input):
                             print(f"    [Controllo] Battuta {idx + 1} non contiene note.")
 
                         for note in notes_in_measure:
-                            pitch = note.get("pitch", 40)
-                            if pitch < 28:
+                            # 999 come fallback evita che note mancanti vengano scambiate per un Mi (40)
+                            pitch = note.get("pitch", 999)
+                            if pitch < SOGLIA_BASS_PITCH:
                                 needs_octave_up = True
                                 break
 
                         if needs_octave_up:
-                            print(f"    -> Battuta {idx + 1}: Note sotto il Mi grave rilevate! Trasposizione +1 ottava.")
+                            print(f"    -> Battuta {idx + 1}: Note sotto la soglia {SOGLIA_BASS_PITCH} rilevate! Trasposizione +1 ottava.")
                             await asyncio.to_thread(
-                            send_musescore_command,
-                            "transposeMeasure",
-                            {"staff": staff_idx, "measure": idx + 1, "direction": "up", "amount": "octave"}  # <--- AGGIUNTO +1 QUI
+                                send_musescore_command,
+                                "transposeMeasure",
+                                {"staff": staff_idx, "measure": idx + 1, "direction": "up", "amount": "octave"}
                             )
-                    modified_measures_count += 1
+                            modified_measures_count += 1
 
-                    return f"Ottimizzazione completata sul rigo {staff_idx}. Alzate di un'ottava {modified_measures_count} battute critiche (Soglia Mi grave MIDI 28)."
-
-            return content if content else "Nessuna azione intrapresa."
+                    return f"Ottimizzazione completata sul rigo {staff_idx}. Alzate di un'ottava {modified_measures_count} battute critiche (Soglia MIDI {SOGLIA_BASS_PITCH})."
+                return content if content else "Nessuna azione intrapresa."
 
         except Exception as e:
             return f"Errore durante la comunicazione o l'esecuzione: {e}"
