@@ -186,7 +186,29 @@ TOOLS_SPEC = [
             "required": ["staff"]
         }
     },
-}
+},
+
+#aggiunta per direzione gambi
+
+{
+        "type": "function",
+        "function": {
+            "name": "setStemDirection",
+            "description": "Forza l'orientamento dei gambi delle note/accordi nello spartito (in alto, in basso o ripristino automatico). Usare per correggere i gambi importati da OMR/Audiveris.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "direction": {
+                        "type": "string",
+                        "description": "Direzione desiderata per i gambi: 'up' (gambi verso l'alto), 'down' (gambi verso il basso), 'auto' (ripristina layout automatico di MuseScore).",
+                        "enum": ["up", "down", "auto"]
+                    }
+                },
+                "required": ["direction"]
+            }
+        }
+    }
+
 ]
 
 
@@ -252,6 +274,7 @@ async def prompt_ollama(user_input):
             "content": (
                 f"Sei un assistente musicale per MuseScore. Puoi usare SOLO: {valid_tools}.\n"
                 "Quando l'utente ti chiede qualcosa, rispondi usando lo strumento o scrivendo SOLO il JSON della funzione.\n"
+                "Se l'utente chiede di orientare o sistemare i gambi delle note, usa la funzione 'cmd' con parametro 'stem-auto', 'stem-up' o 'stem-down'.\n"
                 "NON inserire MAI commenti testuali o note (come // commento) all'interno del codice JSON.\n"
                 "Nei parametri, assegna a 'duration_type' uno di questi valori: 'semiminima', 'croma', 'minima', 'semibreve'.\n"
                 "Usa SEMPRE lo 0 come indice per il primo rigo musicale.\n"
@@ -342,6 +365,12 @@ async def prompt_ollama(user_input):
                     amount_str = str(args.get("amount", "octave"))
                     ms_res = await asyncio.to_thread(send_musescore_command, "transposeStaff", {"staff": staff_idx, "direction": direction_str, "amount": amount_str})
                     return f"Rigo {staff_idx} trasposto. Risposta MuseScore: {ms_res}"
+
+                # ESECUZIONE: cmd (Comandi nativi visivi / layout di MuseScore)
+                if action == "setStemDirection":
+                    dir_str = str(args.get("direction", "auto")).lower().strip()
+                    ms_res = await asyncio.to_thread(send_musescore_command, "setStemDirection", {"direction": dir_str})
+                    return f"Direzione gambi impostata su '{dir_str}'. Risposta MuseScore: {ms_res}"
 
                 # 🎸 ESECUZIONE: ADATTAMENTO INTELLIGENTE PER BASSO ELETTRICO
                 if action == "intelligentBassTranspose":
