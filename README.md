@@ -4,9 +4,8 @@
   <img src="https://img.shields.io/badge/MuseScore-4.x-blue?style=for-the-badge&logo=musescore&logoColor=white" alt="MuseScore 4">
   <img src="https://img.shields.io/badge/Ollama-AI-orange?style=for-the-badge" alt="Ollama">
   <img src="https://img.shields.io/badge/Model-Qwen2.5--Coder-purple?style=for-the-badge" alt="Qwen2.5-Coder">
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
+  <img src="https://img.shields.io/badge/License-GPLv3%20%7C%20MIT-green?style=for-the-badge" alt="GPLv3 / MIT License">
 </p>
-
 ---
 
 ## 🚀 Overview
@@ -74,8 +73,14 @@ pip install httpx
 
 ## 📜 Credits & License
 
-* **Original Work:** This project includes a modified version of the QML plugin structure based on [ghchen99/mcp-musescore](https://github.com/ghchen99/mcp-musescore).
-* **License:** Distributed under the **MIT License**. See the `LICENSE` file for more information.
+- **Original Work:** This project includes a modified version of the QML plugin structure based on [ghchen99/mcp-musescore](https://github.com/ghchen99/mcp-musescore).
+
+- **License:** 
+  - **Python Bridge & Tools:** Distributed under the **GNU General Public License v3.0 (GPLv3)**.
+  - **MuseScore QML Plugin:** Distributed under the **MIT License**.
+  
+  See the `LICENSE` file for more information.
+
 
 ---
 <p align="center">Made with ❤️ for smart musical notation</p>
